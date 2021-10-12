@@ -132,3 +132,4 @@ secret.json
 test.json
 dbinfo.json
 *.json
+/venv/

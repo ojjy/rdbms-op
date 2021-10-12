@@ -1,4 +1,4 @@
-from db_con import MYSQLdb
+from db_con import MYSQLdb, Snowflakedb
 
 if __name__ == "__main__":
     with open('dbinfo.json') as fp:
@@ -11,14 +11,14 @@ if __name__ == "__main__":
                  db=dbinfo['MYSQL_DB']) as mysql:
         version = mysql.query('SELECT VERSION()')
         print(version)
-        with open(file="test1.sql", mode="r", encoding='utf-8') as sql:
-            test = sqlparse.split(sql.read())
-            # test = sqlparse.format(test, reindent=False, identifier_case='lower',keyword_case='lower')
-            # print(test)
-            for idx, stmt in enumerate(test):
-                print(idx, stmt)
-                print("\n\n")
-                mysql.execute(stmt)
+        # with open(file="test1.sql", mode="r", encoding='utf-8') as sql:
+        #     test = sqlparse.split(sql.read())
+        #     # test = sqlparse.format(test, reindent=False, identifier_case='lower',keyword_case='lower')
+        #     # print(test)
+        #     for idx, stmt in enumerate(test):
+        #         print(idx, stmt)
+        #         print("\n\n")
+        #         mysql.execute(stmt)
 
     MYSQLdb.validate(host=dbinfo['MYSQL_HOST'],
               user=dbinfo['MYSQL_USER'],

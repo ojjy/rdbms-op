@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="rdbms-op",
-    version="0.0.3",
+    version="0.0.6",
     author="Yejin Jo",
     author_email="ojjy90@gmail.com",
     description="Operational Helper for Relational Database Managemant System",

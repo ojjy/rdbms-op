@@ -1,7 +1,9 @@
 from db_con import MYSQLdb, Snowflakedb
+import json
+import sqlparse
 
 if __name__ == "__main__":
-    with open('dbinfo.json') as fp:
+    with open('test.json') as fp:
         dbinfo = json.loads(fp.read())
 ###############################################################################
     with MYSQLdb(host=dbinfo['MYSQL_HOST'],

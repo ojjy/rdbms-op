@@ -30,7 +30,7 @@ import json
 import snowflake.connector
 from sqlalchemy import create_engine
 import psycopg2
-import sqlparse
+
 
 class DBMS(ABC):
     def __init__(self, **kwargs):

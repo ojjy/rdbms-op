@@ -5,11 +5,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="rdbms-op",
-    version="0.0.1",
+    version="0.0.3",
     author="Yejin Jo",
     author_email="ojjy90@gmail.com",
     description="Operational Helper for Relational Database Managemant System",
-    long_description="ojjy90 let it go",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ojjy/rdbms-op",
     project_urls={

@@ -135,3 +135,4 @@ dbinfo.json
 /venv/
 *.sql
 *.SQL
+*.csv

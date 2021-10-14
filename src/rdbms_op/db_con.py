@@ -136,9 +136,14 @@ class MYSQLdb(DBMS):
             print(version)
 
 class Snowflakedb(DBMS):
-    def __init__(self, **kwargs):
+    def __init__(self, warehouse, **kwargs):
         super().__init__(**kwargs)
-        self._con = snowflake.connector.connect(user=self.user, password=self.pwd, account=self.host)
+        self.warehouse = warehouse
+        self._con = snowflake.connector.connect(user=self.user,
+                                                password=self.pwd,
+                                                account=self.host,
+                                                warehouse=self.warehouse,
+                                                database=self.db)
         self._cursor = self._con.cursor()
 
     def __enter__(self):
@@ -176,9 +181,14 @@ class Snowflakedb(DBMS):
         return self.close()
 
     @classmethod
-    def validate(self, user, pwd, account):
+    def validate(self, **kwargs):
         try:
-            con = snowflake.connector.connect(user = user, password=pwd, account=account)
+            con = snowflake.connector.connect(user = kwargs['user'],
+                                              password=kwargs['pwd'],
+                                              account=kwargs['account'],
+                                              warehouse=kwargs['warehouse'],
+                                              database=kwargs['database'],
+                                              schema=kwargs['schema'])
             cur = con.cursor()
             version = cur.execute("SELECT current_version()").fetchone()[0]
             print(version)

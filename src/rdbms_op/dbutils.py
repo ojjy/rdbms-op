@@ -19,6 +19,12 @@ def sql_to_csv():
         df.to_csv(f"{dbn}_{tbn}.csv", index=False)
         print(f"success: {dbn}_{tbn}.csv export")
 
+
+def csv_to_snowflake():
+    with open('test.json') as fp:
+        dbinfo = json.loads(fp.read())
+    connect_str = f"snowflake://{dbinfo['SF_USER']}:{dbinfo['SF_USER']}@{self.host}"
+
 if __name__ == "__main__":
     sql_to_csv()
 

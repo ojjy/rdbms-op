@@ -136,3 +136,4 @@ dbinfo.json
 *.sql
 *.SQL
 *.csv
+.DS*

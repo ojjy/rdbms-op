@@ -21,6 +21,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src", exclude=["*.json", "*.SQL", "*.sql"]),
+    packages=setuptools.find_packages(where="src", exclude=["*.json", "*.SQL", "*.sql", "work_files"]),
     python_requires=">=3.6",
 )

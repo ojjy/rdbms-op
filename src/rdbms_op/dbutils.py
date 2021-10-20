@@ -1,12 +1,31 @@
 import pandas as pd
 import pymysql
 import json
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, engine
 import snowflake
 import os
 import time
+import urllib.parse
+import pymssql
 
-
+def dbcon():
+    with open("dbinfo.json") as fp:
+        dbinfo = json.loads(fp.read())
+    #     dbconnector://(user):(password)@(host):(port)/(db)
+    # need to use urllib lib because password include reserved character like @
+    password = urllib.parse.quote_plus(f"{dbinfo['MARIADB_PWD']}")
+    snow_str = f"snowflake://{dbinfo['SF_USER']}:{dbinfo['SF_PWD']}@{dbinfo['SF_ACCOUNT']}/{dbinfo['SF_DB']}/{dbinfo['SF_SCHEMA']}?warehouse={dbinfo['SF_WH']}"
+    mysql_str = f"mysql+pymysql://{dbinfo['MYSQL_USER']}:{dbinfo['MYSQL_PWD']}'@'{dbinfo['MYSQL_HOST']}/{dbinfo['MYSQL_DB']}?charset=utf8mb4"
+    maria_str = f"mariadb+mariadbconnector://{dbinfo['MARIADB_USER']}:{password}@{dbinfo['MARIADB_HOST']}:{dbinfo['MARIADB_PORT']}/{dbinfo['MARIADB_DB']}"
+    postgre_str = f"postgresql://{dbinfo['POSTGRE_USER']}:{dbinfo['POSTGRE_PWD']}@{dbinfo['POSTGRE_HOST']}/{dbinfo['POSTGRE_DB']}"
+    mssql_str = f"mssql+pymssql://{dbinfo['MSSQL_USER']}:{dbinfo['MSSQL_PWD']}@{dbinfo['MSSQL_HOST']}:{dbinfo['MSSQL_PORT']}/{dbinfo['MSSQL_DB']}"
+    print(mssql_str)
+    connection = create_engine(mssql_str)
+    connection.execute("create table tbl(col1 int, col2 varchar(8));")
+    connection.execute("insert into tbl values(1, 'test');")
+    result = connection.execute("select * from tbl;").fetchone()
+    print(result)
+    connection.execute("drop table tbl;")
 
 def csv_to_snowflake():
     try:
@@ -47,7 +66,7 @@ def mig_velocity_check():
         table_name = file_name[3:-4] # 앞 3자리 빼고 뒤 확장자 뺀 나머지가 table_name
         print(table_name)
 
-        df = pd.read_csv(full_path, encoding='euc-kr')
+        df = pd.read_csv(full_path, encoding='utf-8')
         cnx = create_engine(f"mysql+pymysql://{dbinfo['MYSQL_USER']}:{dbinfo['MYSQL_PWD']}@{dbinfo['MYSQL_HOST']}/{dbinfo['MYSQL_DB']}?charset=utf8mb4")
         cnx.execute(f"TRUNCATE TABLE {table_name}")
         df.to_sql(name=f'{table_name}', con=cnx, index=False, if_exists='append', chunksize=16000)
@@ -75,4 +94,10 @@ def mig_velocity_check():
     print(f"mysql execution time = {mysql_end_time-mysql_start_time:.2f}\n snowflake execution time = {snow_end_time-snow_start_time:.2f}")
 
 if __name__ == "__main__":
-    mig_velocity_check()
+    dbcon()
+
+
+    """
+    References
+    https://stackoverflow.com/questions/58661569/password-with-cant-connect-the-database
+    """

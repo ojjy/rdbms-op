@@ -25,11 +25,6 @@ https://eine.tistory.com/entry/%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC
 """
 
 from abc import ABC, abstractmethod
-import pymysql
-import json
-import snowflake.connector
-from sqlalchemy import create_engine
-import psycopg2
 
 
 class DBMS(ABC):
@@ -38,6 +33,7 @@ class DBMS(ABC):
         self.user = kwargs['user']
         self.pwd = kwargs['pwd']
         self.db = kwargs['db']
+        self.port = kwargs['port']
         self._con = None
         self._cursor = None
 
@@ -82,215 +78,11 @@ class DBMS(ABC):
         pass
 
 
-class MYSQLdb(DBMS):
-    def __init__(self, port, database='ds', **kwargs):
-        super().__init__(**kwargs)
-        self.port = port
-        self._con = pymysql.connect(user=self.user,
-                                    password=self.pwd,
-                                    host=self.host,
-                                    port=self.port,
-                                    database=self.db)
-        self._cursor = self._con.cursor()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        return self.close()
-
-    @property
-    def connection(self):
-        return self._con
-
-    @property
-    def cursor(self):
-        return self._cursor
-
-    def execute(self, sql, params=None):
-        return self._cursor.execute(sql, params or ())
-
-    def query(self, sql, params=None):
-        self._cursor.execute(sql, params or ())
-        return self.fetchall()
-
-    def fetchone(self):
-        return self._cursor.fetchone()
-
-    def fetchall(self):
-        return self._cursor.fetchall()
-
-    def commit(self):
-        self.connection.commit()
-
-    def close(self, commit=True):
-        self.commit()
-        return self._con.close()
-
-    @classmethod
-    def validate(self, user, pwd, host, port):
-        with pymysql.connect(user=user, password=pwd, host=host, port=port) as mysqldb:
-            cur = mysqldb.cursor()
-            cur.execute("SELECT VERSION()")
-            version = cur.fetchone()
-            print(version)
-
-class Snowflakedb(DBMS):
-    def __init__(self, warehouse, **kwargs):
-        super().__init__(**kwargs)
-        self.warehouse = warehouse
-        self._con = snowflake.connector.connect(user=self.user,
-                                                password=self.pwd,
-                                                account=self.host,
-                                                warehouse=self.warehouse,
-                                                database=self.db)
-        self._cursor = self._con.cursor()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        return self.close()
-
-    @property
-    def connection(self):
-        return self._con
-
-    @property
-    def cursor(self):
-        return self._cursor
-
-    def execute(self, sql, params):
-        return self._cursor.execute(sql, params or ())
-
-    def query(self, sql, params):
-        self._cursor.execute(sql, params or ())
-        return self._cursor.fetchall()
-
-    def fetchone(self):
-        return self._cursor.fetchone()
-
-    def fetchall(self):
-        return self._cursor.fetchall()
-
-    def commit(self):
-        return self.commit()
-
-    def close(self, commit=True):
-        self.commit()
-        return self.close()
-
-    @classmethod
-    def validate(self, **kwargs):
-        try:
-            con = snowflake.connector.connect(user = kwargs['user'],
-                                              password=kwargs['pwd'],
-                                              account=kwargs['account'],
-                                              warehouse=kwargs['warehouse'],
-                                              database=kwargs['database'],
-                                              schema=kwargs['schema'])
-            cur = con.cursor()
-            version = cur.execute("SELECT current_version()").fetchone()[0]
-            print(version)
-
-        except Exception as e:
-            print(e)
-
-class Postgredb(DBMS):
-    def __init__(self, port, database, **kwargs):
-        super().__init__(**kwargs)
-        self.port = port
-        self.database = database
-        self._con = psycopg2.connect(host=self.host, user=self.user, password=self.pwd, port=self.port)
-        self._cursor = self._con.cursor()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        return self.close()
-
-    @property
-    def connection(self):
-        return self._con
-
-    @property
-    def cursor(self):
-        return self._cursor
-
-    def execute(self, sql, params):
-        return self._cursor.execute(sql, params or ())
-
-    def query(self, sql, params):
-        self._cursor.execute(sql, params or ())
-        return self._cursor.fetchall()
-
-    def fetchone(self):
-        return self._cursor.fetchone()
-
-    def fetchall(self):
-        return self._cursor.fetchall()
-
-    def commit(self):
-        return self.commit()
-
-    def close(self):
-        self.commit()
-        return self.close()
-
-class SQLAlchemycon(DBMS):
-    def __init__(self, port=None, **kwargs):
-        super().__init__(**kwargs)
-        connect_str = f"snowflake://{self.user}:{self.pwd}@{self.host}"
-        self.port = port
-        engine = create_engine(connect_str)
-        self._con = engine.connect()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        return self.close()
-
-    def cursor(self):
-        return self
-
-    def fetchall(self):
-        return self.fetchall()
-
-    def fetchone(self):
-        return self.fetchone()
-
-    def connection(self):
-        return self._con
-
-    def execute(self, sql, params=None):
-        return self._con.execute(sql)
-
-    def query(self, sql, params):
-        return self._con.execute((sql, params or ())).fetchall()
 
 
-    def commit(self):
-        return self.commit()
 
-    def close(self):
-        return self.close()
 
-    @classmethod
-    def validate(self):
-        connect_str = f"snowflake://{dbinfo['SF_USER']}:{dbinfo['SF_PWD']}@{dbinfo['SF_ACCOUNT']}"
-        try:
-            engine = create_engine(connect_str)
-            self.con = engine.connect()
-            version = self.con.execute("SELECT CURRENT_VERSION()").fetchone()[0]
-            print(version)
-        except Exception as e:
-            print(e)
 
-        finally:
-            self.con.close()
-            engine.dispose()
 
 
 

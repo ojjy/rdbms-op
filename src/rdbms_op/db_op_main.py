@@ -1,10 +1,32 @@
-from db_con import MYSQLdb, Snowflakedb
+
+from rdbms_op.snow_con import Snowflakedb
 import json
 import sqlparse
+from rdbms_op.alchemy_con import SQLAlchemycon
+
+"""
+connector type means the string of connection to use sqlalchemy library such as
+snowflake: "snowflake"
+mariadb: "mariadb+mariadbconnector"
+mysql: "mysql+pymysql"
+mssql: "mssql+pymssql"
+postgre: "postgresql"
+
+
+references.
+https://docs.sqlalchemy.org/en/14/core/engines.html
+"""
 
 if __name__ == "__main__":
     with open('dbinfo.json') as fp:
         dbinfo = json.loads(fp.read())
+
+    SQLAlchemycon(host=dbinfo['SF_HOST'],
+                  user=dbinfo['SF_USER'],
+                  pwd=dbinfo['SF_PWD'],
+                  port=dbinfo['SF_PORT'],
+                  db=dbinfo['SF_DB'],
+                  connector_type=dbinfo['SF_CON'])
 ###############################################################################
     # with MYSQLdb(host=dbinfo['MYSQL_HOST'],
     #              user=dbinfo['MYSQL_USER'],

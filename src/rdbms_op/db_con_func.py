@@ -2,7 +2,7 @@ import pymysql
 import json
 import psycopg2
 import snowflake.connector
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 
 def maria_connector():
     with open('dbinfo.json') as fp:

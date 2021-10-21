@@ -19,8 +19,8 @@ def dbcon():
     maria_str = f"mariadb+mariadbconnector://{dbinfo['MARIADB_USER']}:{password}@{dbinfo['MARIADB_HOST']}:{dbinfo['MARIADB_PORT']}/{dbinfo['MARIADB_DB']}"
     postgre_str = f"postgresql://{dbinfo['POSTGRE_USER']}:{dbinfo['POSTGRE_PWD']}@{dbinfo['POSTGRE_HOST']}/{dbinfo['POSTGRE_DB']}"
     mssql_str = f"mssql+pymssql://{dbinfo['MSSQL_USER']}:{dbinfo['MSSQL_PWD']}@{dbinfo['MSSQL_HOST']}:{dbinfo['MSSQL_PORT']}/{dbinfo['MSSQL_DB']}"
-    print(mssql_str)
-    connection = create_engine(mssql_str)
+    print(maria_str)
+    connection = create_engine(maria_str)
     connection.execute("create table tbl(col1 int, col2 varchar(8));")
     connection.execute("insert into tbl values(1, 'test');")
     result = connection.execute("select * from tbl;").fetchone()

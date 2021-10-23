@@ -93,6 +93,11 @@ def mig_velocity_check():
 
     print(f"mysql execution time = {mysql_end_time-mysql_start_time:.2f}\n snowflake execution time = {snow_end_time-snow_start_time:.2f}")
 
+
+# db -> csv
+# csv -> db
+
+
 if __name__ == "__main__":
     dbcon()
 

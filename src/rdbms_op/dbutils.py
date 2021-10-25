@@ -96,9 +96,7 @@ def mig_velocity_check():
 
 # db -> csv
 # csv -> db
-
 # df -> csv
-
 # df->db
 if __name__ == "__main__":
     dbcon()
